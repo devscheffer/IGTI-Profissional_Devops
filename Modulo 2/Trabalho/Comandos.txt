@@ -1,0 +1,11 @@
+cd /
+mkdir landingpage
+docker run hello-world
+docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=12345678 -d mysql:latest
+docker run --name mywordpress1 -e WORDPRESS_DB_PASSWORD=12345678 -e WORDPRESS_DB_NAME=dbwordpress -e WORDPRESS_DB_HOST=some-mysql -e WORDPRESS_DB_USER=root -e WORDPRESS_TABLE_PREFIX=wpLaboratorio --link some-mysql:mysql -v /landingpage:/var/www/html -d wordpress:latest
+docker run --name mywordpress2 -e WORDPRESS_DB_PASSWORD=12345678 -e WORDPRESS_DB_NAME=dbwordpress -e WORDPRESS_DB_HOST=some-mysql -e WORDPRESS_DB_USER=root -e WORDPRESS_TABLE_PREFIX=wpLaboratorio --link some-mysql:mysql -v /landingpage:/var/www/html -d wordpress:latest
+docker run -d --name HaproxyLB -p 8080:80 -e BALANCE=source -e MODE=tcp -e OPTION=tcplog --link mywordpress1:mywordpress1 --link mywordpress2:mywordpress2 dockercloud/haproxy
+
+docker exec -it some-mysql mysql -u root -p12345678
+create database dbwordpress;
+exit;
